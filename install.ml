@@ -22,8 +22,8 @@
 
 (* ----- BEGIN CONFIGURATION ---- *)
 
-let zlib = match Sys.os_type with "Win32" -> "zlib.lib" | _ -> "-lz"
-let bytecode = true
+let zlib = "-cclib ../../zlib/libz.a"
+let bytecode = false
 let native = true
 
 (* ------ END CONFIGURATION ----- *)
@@ -51,7 +51,7 @@ let modules l ext =
 
 ;;
 
-let motiontwin = ":pserver:anonymous@cvs.motion-twin.com:/cvsroot" in
+(*let motiontwin = ":pserver:anonymous@cvs.motion-twin.com:/cvsroot" in
 
 let download () =
 
@@ -61,50 +61,52 @@ let download () =
 	cvs motiontwin "co ocaml/mtasc";
 	cvs motiontwin "co ocaml/swflib";
 	cvs motiontwin "co ocaml/extc";
-	
-in
+
+in*)
 
 let compile() =
 
 	(try Unix.mkdir "bin" 0o740 with Unix.Unix_error(Unix.EEXIST,_,_) -> ());
 
 	(* EXTLIB *)
-	Sys.chdir "ocaml/extlib-dev";
+	(*Sys.chdir "ocaml/extlib-dev";
 	command ("ocaml install.ml -nodoc -d .. " ^ (if bytecode then "-b " else "") ^ (if native then "-n" else ""));
 	msg "";
-	Sys.chdir "../..";
+	Sys.chdir "../..";*)
 
 	(* EXTC *)
 	Sys.chdir "ocaml/extc";
 	let c_opts = (if Sys.ocaml_version < "3.08" then " -ccopt -Dcaml_copy_string=copy_string " else " ") in
 	command ("ocamlc" ^ c_opts ^ "extc_stubs.c");
 
-	let options = "-cclib ../extc/extc_stubs" ^ obj_ext ^ " -cclib " ^ zlib ^ " extc.mli extc.ml" in
-	if bytecode then command ("ocamlc -a -o extc.cma " ^ options);
-	if native then command ("ocamlopt -a -o extc.cmxa " ^ options);
+	let options = "-cclib ../extc/extc_stubs.o " ^ zlib ^ " -package extlib extc.ml process.ml" in
+	if bytecode then command ("ocamlfind ocamlc -a -o extc.cma " ^ options);
+	if native then command ("ocamlfind ocamlopt -a -o extc.cmxa " ^ options);
+	(*command ("make");*)
 	Sys.chdir "../..";
 
 	(* SWFLIB *)
 	Sys.chdir "ocaml/swflib";
-	let files = "-I .. -I ../extc as3.mli as3code.ml as3parse.ml swf.ml swfZip.ml actionScript.ml swfParser.ml" in
+	(*let files = "-I .. -I ../extc as3.mli as3code.ml as3parse.ml swf.ml swfZip.ml actionScript.ml swfParser.ml" in
 	if bytecode then command ("ocamlc -a -o swflib.cma " ^ files);
-	if native then command ("ocamlopt -a -o swflib.cmxa " ^ files);
+	if native then command ("ocamlopt -a -o swflib.cmxa " ^ files);*)
+	command ("make");
 	Sys.chdir "../..";
 
 	(* MTASC *)
 	Sys.chdir "ocaml/mtasc";
 	command "ocamllex lexer.mll";
-	ocamlc "expr.ml lexer.ml";
-	ocamlc "-pp camlp4o parser.ml";
-	ocamlc "-I .. -I ../extc -I ../swflib typer.ml class.ml plugin.ml genSwf.ml main.ml";
+	(*ocamlc "expr.ml lexer.ml";
+	ocamlc "-pp camlp5o parser.ml";*)
+	command "ocamlfind ocamlopt -c expr.ml lexer.ml -pp camlp5o parser.ml -I .. -I ../extc -I ../extlib-leftovers -I ../swflib -package extlib typer.ml class.ml plugin.ml genSwf.ml main.ml ";
 	let mlist = ["expr";"lexer";"parser";"typer";"class";"plugin";"genSwf";"main"] in
-	if bytecode then command ("ocamlc -custom -o ../../bin/mtasc-byte" ^ exe_ext ^ " ../extLib.cma ../extc/extc.cma ../swflib/swflib.cma " ^ modules mlist ".cmo");
-	if native then command ("ocamlopt -o ../../bin/mtasc" ^ exe_ext ^ " ../extLib.cmxa ../extc/extc.cmxa ../swflib/swflib.cmxa " ^ modules mlist ".cmx");
+	if bytecode then command ("ocamlfind ocamlc -custom -o ../../bin/mtasc-byte" ^ exe_ext ^ " ../extLib-leftovers/extLib-leftovers.cma ../extc/extc.cma ../swflib/swflib.cma " ^ (modules mlist ".cmo") ^ " -package extlib");
+	if native then command ("ocamlfind ocamlopt -o ../../bin/mtasc" ^ exe_ext ^ " -linkpkg -package extlib ../extLib-leftovers/extLib-leftovers.cmxa ../extc/extc.cmxa ../swflib/swflib.cmxa " ^ (modules mlist ".cmx") ^ "");
 
 in
 let startdir = Sys.getcwd() in
 try
-	download();
+	(*download();*)
 	compile();
 	Sys.chdir startdir;
 with
