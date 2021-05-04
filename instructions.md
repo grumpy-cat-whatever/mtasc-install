@@ -7,35 +7,35 @@
 
 2. Download `setup-x86_64.exe` from https://cygwin.com/
    and save it into your OCaml folder from the previous step
-   (e.g. `C:\OCaml32\\`).
+   (e.g. `C:\OCaml32\`).
 3. Run `setup-x86_64.exe` and install the package `perl-IPC-System-Simple`.
    Optional but recommended: Let the setup create a shortcut
    to its shell (last step of the setup).
-4. Open the Cygwin shell. Run 
+4. You need to install ocamlfind: Open the Cygwin shell, then run 
    ```bash
    opam install ocamlfind
    ```
-5. Once that's done, run
+5. Once that's done, use ocamlfind to install extlib and camlp5: Run
    ```bash
    ocamlfind install extlib camlp5
    ```
 6. Now, finally, check out this repository via git
    ```bash
-   git clone https://github.com/grumpy-cat-whatever/mtasc-install
+   git clone https://github.com/grumpy-cat-whatever/mtasc-install.git
    ```
    Or download the source as a `*.zip` file from Github.
 7. Go to the `zlib/` subdirectory and follow the instructions.
-8. Clone the [ocamllibs project]() into a subdirectory.
+8. Clone the [ocamllibs project](https://github.com/grumpy-cat-whatever/ocamllibs) into a subdirectory.
    I kept the original name `ocaml`, but I believe any **reasonable**
    name would work:
    ```bash
-   git clone https://github.com/grumpy-cat-whatever/ocamllibs ocaml
+   git clone https://github.com/grumpy-cat-whatever/ocamllibs.git ocaml
    ```
    Or download the source as a `*.zip` file from Github.
-9. Go to the subdirectory from step 8 and clone the [mtasc project]()
+9. Go to the subdirectory from step 8 and clone the [mtasc project](https://github.com/grumpy-cat-whatever/mtasc)
    into a subdirectory called `mtasc` (the name is **required**).
    ```bash
-   git clone https://github.com/grumpy-cat-whatever/mtasc mtasc
+   git clone https://github.com/grumpy-cat-whatever/mtasc.git mtasc
    ```
    Or download the source as a `*.zip` file from Github.
 10. Your project structure should look something like this now:
@@ -62,7 +62,7 @@
     |
     -- zlib/ 
     ```
-11. If lady fortune smiles upon you, you should be able to run the
+11. If lady fortune smiles upon you today, you should be able to run the
     following in the `mtasc-install` folder:
     ```bash
     ocaml install.ml
